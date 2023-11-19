@@ -1,38 +1,31 @@
-from multiprocessing import Process, Queue
-from pocketsphinx import LiveSpeech
 import json
 import sys
 import os
 
-def listen_word(word, queue):
-    speech = LiveSpeech(keyphrase=word, kws_threshold=1e-10)
-    for phrase in speech:
-        queue.put(f"Detected: {phrase.segments(detailed=True)}")
+from recorder import live_speech
 
-def listen_words(words, queue):
-    processes: list[Process] = []
-    for word in words:
-        processes.append(Process(target=listen_word, args=(word,queue)))
+def detect_wakeup(command: str, wakeup_words: list[str]):
+    command = command.lower()
 
-    for process in processes:
-        process.start()
+    for word in wakeup_words:
+        word = word.lower()
+        if word in command:
+            return True
 
-    while True:
-        detection = queue.get()
-        print(detection)
+    return False
 
-    for process in processes:
-        process.join()
-
-if not os.path.exists("phrases.json"):
+if not os.path.exists("wakeup_words.json"):
     print("You must run init.py first!")
     sys.exit(1)
 
-with open("phrases.json", "r") as f:
-    phrases = json.load(f)
+with open("wakeup_words.json", "r") as f:
+    wakeup_words = json.load(f)
 
-print("Detecting keyphrase...")
-
-queue = Queue()
-
-listen_words(phrases, queue)
+while True:
+    for message in live_speech():
+        if detect_wakeup(message, wakeup_words):
+            print(f"Detected: {message}")
+            break
+    for message in live_speech(50):
+        print(f"Command: {message}")
+        break

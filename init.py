@@ -1,17 +1,18 @@
-from pocketsphinx import LiveSpeech
 import json
 
-phrases = []
+from recorder import live_speech
+
+wakeup_words = []
 
 for i in range(10):
-    print("Please say the keyhprase")
-    for phrase in LiveSpeech():
-        print(f"Heard '{str(phrase)}'")
-        phrases.append(str(phrase))
+    print("Please say the wakeup keyphrase")
+    for phrase in live_speech():
+        print(f"Heard '{str(phrase)}'\n")
+        wakeup_words.append(phrase)
         break
 
-with open("phrases.json", "w") as f:
-    json.dump(phrases, f)
+with open("wakeup_words.json", "w") as f:
+    json.dump(list(set(wakeup_words)), f)
 
 print("Recognition finished")
 
