@@ -16,10 +16,10 @@ messages = [
 ]
 
 def detect_wakeup(command: str, wakeup_words: list[str]):
-    command = command.lower()
+    command = re.sub(r"[,\.!?]", "", command.lower())
 
     for word in wakeup_words:
-        word = word.lower()
+        word = re.sub(r"[,\.!?]", "", word.lower())
         if word in command:
             return True
 
