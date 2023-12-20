@@ -4,6 +4,7 @@ import playsound
 import json
 import sys
 import os
+import re
 
 from recorder import live_speech
 
